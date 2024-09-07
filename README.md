@@ -17,6 +17,5 @@
 ## 效果展示
 ### 请求参数
 ![07b178c67005b2224db563c8de879c28](https://github.com/user-attachments/assets/55a1312a-eafc-4e1f-9a66-4bdfe3e7921c)
-
 ### 后端接收
 ![1](https://github.com/user-attachments/assets/3637c69d-d4af-436d-961e-4024cc9824e5)
