@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MsRequestBody {
+public @interface MsSingleRequestBody {
 
     /**
      * 参数是否必传
