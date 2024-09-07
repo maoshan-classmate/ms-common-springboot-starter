@@ -44,20 +44,20 @@ public class MsRequestBodyHandler implements HandlerMethodArgumentResolver {
         String stringBuilder;
         try {
             assert request != null;
-            try(BufferedReader reader = request.getReader()) {
-                stringBuilder= readData(reader);
+            try (BufferedReader reader = request.getReader()) {
+                stringBuilder = readData(reader);
             }
         } catch (IOException e) {
             throw new IOException(e);
         }
-        if (stringBuilder.startsWith(CURLY_BRACKET_OPEN)){
-            if(ClassUtil.isPrimitiveWrapper(parameterType) || ClassUtil.isBasicType(parameterType) || String.class.equals(parameterType)){
+        if (stringBuilder.startsWith(CURLY_BRACKET_OPEN)) {
+            if (ClassUtil.isPrimitiveWrapper(parameterType) || ClassUtil.isBasicType(parameterType) || String.class.equals(parameterType)) {
                 JSONObject jsonObject = JSONObject.parseObject(stringBuilder);
                 return jsonObject.getObject(name, parameterType);
-            }else {
+            } else {
                 throw new IllegalArgumentException("@MsRequestBody 只支持基本数据类型、包装类型、字符串类型");
             }
-        }else{
+        } else {
             throw new IllegalArgumentException("@MsRequestBody 只支持json格式");
         }
     }
