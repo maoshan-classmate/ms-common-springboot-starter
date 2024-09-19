@@ -55,10 +55,10 @@ public class MsRequestBodyHandler implements HandlerMethodArgumentResolver {
                 JSONObject jsonObject = JSONObject.parseObject(stringBuilder);
                 return jsonObject.getObject(name, parameterType);
             } else {
-                throw new IllegalArgumentException("@MsRequestBody 只支持基本数据类型、包装类型、字符串类型");
+                throw new IllegalArgumentException("@MsSingleRequestBody 只支持基本数据类型、包装类型、字符串类型");
             }
         } else {
-            throw new IllegalArgumentException("@MsRequestBody 只支持json格式");
+            throw new IllegalArgumentException("@MsSingleRequestBody 只支持json格式");
         }
     }
 
