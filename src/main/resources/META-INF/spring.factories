@@ -1,3 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.ms.config.WebMvcConfig
+  com.ms.config.WebMvcConfig,\
+  com.ms.strategy.MobileDesensitizeStrategy,\
+  com.ms.context.DesensitizeContext
   
