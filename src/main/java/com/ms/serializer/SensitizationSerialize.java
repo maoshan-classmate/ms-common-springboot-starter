@@ -40,7 +40,6 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
 
 
 
-
     public SensitizationSerialize(Integer startInclude, Integer endExclude, String customChar) {
         this.startInclude = startInclude;
         this.endExclude = endExclude;
