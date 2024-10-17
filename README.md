@@ -1,6 +1,6 @@
 #  ms-common-springboot-starter【自定义通用组件】
 
-使用Java开发的自定义通用组件，涉及对@RequestBody注解的补充，开箱即用！让我们一起成长！
+使用Java开发的自定义通用组件，开箱即用！让我们一起成长！
 
 ## 功能
 
