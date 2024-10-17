@@ -2,8 +2,8 @@ package com.ms.annotation;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.ms.enums.DesensitizationTypeEnum;
-import com.ms.serializer.DesensitizationSerialize;
+import com.ms.enums.SensitizationTypeEnum;
+import com.ms.serializer.SensitizationSerialize;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,13 +19,13 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside
-@JsonSerialize(using = DesensitizationSerialize.class)
-public @interface MsDesensitization {
+@JsonSerialize(using = SensitizationSerialize.class)
+public @interface MsSensitization {
 
     /**
      * 脱敏数据类型，CUSTOM注解下，startInclude和endExclude生效
      */
-    DesensitizationTypeEnum type() default DesensitizationTypeEnum.CUSTOM;
+    SensitizationTypeEnum type() default SensitizationTypeEnum.CUSTOM;
 
     /**
      * 是否使用正则表达式进行脱敏

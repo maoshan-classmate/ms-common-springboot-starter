@@ -2,7 +2,7 @@ package com.ms.strategy;
 
 import cn.hutool.core.util.DesensitizedUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.ms.enums.DesensitizationTypeEnum;
+import com.ms.enums.SensitizationTypeEnum;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -13,8 +13,7 @@ import java.io.IOException;
  * @version 1.0
  */
 @Component
-public class MobileDesensitizeStrategy extends AbstractDesensitizeStrategy{
-
+public class MobileSensitizeStrategy implements SensitizeStrategy{
 
     /**
      * 数据脱敏
@@ -25,8 +24,11 @@ public class MobileDesensitizeStrategy extends AbstractDesensitizeStrategy{
      * @param jsonGenerator JSON数据写入
      */
     @Override
-    public void desensitizeDate(String content, int startInclude, int endExclude, String customChar, JsonGenerator jsonGenerator) throws IOException {
-        jsonGenerator.writeString(DesensitizedUtil.mobilePhone(content));
+    public String sensitizeDate(String content, int startInclude, int endExclude, String customChar, JsonGenerator jsonGenerator) throws IOException {
+        String sensitizeContent = DesensitizedUtil.mobilePhone(content);
+        jsonGenerator.writeString(sensitizeContent);
+        return sensitizeContent;
+
     }
 
     /**
@@ -35,7 +37,7 @@ public class MobileDesensitizeStrategy extends AbstractDesensitizeStrategy{
      * @return 是否匹配脱敏策略
      */
     @Override
-    public boolean getDetailStrategy(DesensitizationTypeEnum type) {
-        return DesensitizationTypeEnum.MOBILE.equals(type);
+    public boolean getDetailStrategy(SensitizationTypeEnum type) {
+        return SensitizationTypeEnum.MOBILE.equals(type);
     }
 }

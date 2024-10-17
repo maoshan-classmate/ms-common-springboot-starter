@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum DesensitizationTypeEnum {
+public enum SensitizationTypeEnum {
 
     /**
      * 自定义
