@@ -28,6 +28,11 @@ public @interface MsDesensitization {
     DesensitizationTypeEnum type() default DesensitizationTypeEnum.CUSTOM;
 
     /**
+     * 是否使用正则表达式进行脱敏
+     */
+    boolean enableRegex() default false;
+
+    /**
      * 脱敏开始位置（包含）
      */
     int startInclude() default 0;
@@ -41,5 +46,10 @@ public @interface MsDesensitization {
      * 脱敏使用的特殊字符
      */
     String customChar() default "*";
+
+    /**
+     * 正则表达式进行脱敏
+     */
+    String customRegex() default "";
 
 }

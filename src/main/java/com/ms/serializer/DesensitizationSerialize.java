@@ -1,5 +1,6 @@
 package com.ms.serializer;
 
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -37,7 +38,7 @@ public class DesensitizationSerialize extends JsonSerializer<String> implements 
 
     private String customChar;
 
-    public DesensitizationSerialize(DesensitizationTypeEnum desensitizationType, int startInclude, int endExclude, String customChar) {
+    public DesensitizationSerialize(DesensitizationTypeEnum desensitizationType, int startInclude, int endExclude, String customChar,boolean enableRegex,String customRegex) {
         this.desensitizationType = desensitizationType;
         this.startInclude = startInclude;
         this.endExclude = endExclude;
@@ -64,13 +65,34 @@ public class DesensitizationSerialize extends JsonSerializer<String> implements 
                     msDesensitization = property.getContextAnnotation(MsDesensitization.class);
                 }
                 if (msDesensitization != null) {
-                    //返回自定义的序列化器
-                    return new DesensitizationSerialize(msDesensitization.type(), msDesensitization.startInclude(),
-                            msDesensitization.endExclude(), msDesensitization.customChar());
+                    return createCustomDesensitization(msDesensitization.type(), msDesensitization.startInclude(),
+                            msDesensitization.endExclude(), msDesensitization.customChar(),msDesensitization.enableRegex(),msDesensitization.customRegex());
                 }
             }
             return prov.findValueSerializer(property.getType(), property);
         }
         return prov.findNullValueSerializer(null);
+    }
+
+    /**
+     * 构建自定义序列化器
+     * @param desensitizationType 脱敏数据类型
+     * @param startInclude 脱敏开始位置（包含）
+     * @param endExclude 脱敏结束位置（不包含）
+     * @param customChar 脱敏使用的特殊字符
+     * @param enableRegex 是否使用正则表达式进行脱敏
+     * @param customRegex 正则表达式进行脱敏
+     * @return 自定义序列化器
+     */
+    private DesensitizationSerialize createCustomDesensitization(DesensitizationTypeEnum desensitizationType, int startInclude, int endExclude,
+                                                                 String customChar,boolean enableRegex,String customRegex) {
+        if (DesensitizationTypeEnum.CUSTOM == desensitizationType && enableRegex){
+            //优先使用自定义正则表达式
+            if (StrUtil.isBlank(customRegex)){
+                throw new IllegalArgumentException("使用正则表达式进行数据脱敏时，正则表达式不允许为空！");
+            }
+            return new DesensitizationSerialize(desensitizationType, startInclude, endExclude, customChar, true,customRegex);
+        }
+        return new DesensitizationSerialize(desensitizationType, startInclude, endExclude, customChar, false,"");
     }
 }
