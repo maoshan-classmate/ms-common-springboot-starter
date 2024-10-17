@@ -40,6 +40,6 @@ public @interface MsDesensitization {
     /**
      * 脱敏使用的特殊字符
      */
-    String customRegex() default "*";
+    String customChar() default "*";
 
 }

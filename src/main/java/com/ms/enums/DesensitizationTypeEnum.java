@@ -16,46 +16,43 @@ public enum DesensitizationTypeEnum {
     /**
      * 自定义
      */
-    CUSTOM("custom", 0),
+    CUSTOM,
 
     /**
      * 手机号
      */
-    MOBILE("mobile",1),
+    MOBILE,
 
     /**
      * 身份证
      */
-    ID_CARD("idCard",2),
+    ID_CARD,
 
     /**
      * 邮箱
      */
-    EMAIL("email",3),
+    EMAIL,
 
     /**
      * 银行卡
      */
-    BANK_CARD("bankCard",4),
+    BANK_CARD,
 
     /**
      * 地址
      */
-    ADDRESS("address",5),
+    ADDRESS,
 
     /**
      * 姓名
      */
-    NAME("name",6),
+    NAME,
 
     /**
      * 密码
      */
-    PASSWORD("password",7)
+    PASSWORD
     ;
 
-    private final String desc;
-
-    private final Integer type;
 
 }

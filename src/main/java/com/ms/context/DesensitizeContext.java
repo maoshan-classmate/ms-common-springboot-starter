@@ -27,20 +27,13 @@ public class DesensitizeContext {
     @Resource
     private List<AbstractDesensitizeStrategy> desensitizeStrategyList;
 
-    private DesensitizationTypeEnum desensitizationType;
-
-    private int startInclude;
-
-    private int endExclude;
-
-    private String customRegex;
 
     /**
      * 根据脱敏类型获取对应的脱敏策略
      * @param type 脱敏类型
      * @return 具体的脱敏策略
      */
-    public AbstractDesensitizeStrategy getDesensitizeStrategy(Integer type) {
+    public AbstractDesensitizeStrategy getDesensitizeStrategy(DesensitizationTypeEnum type) {
         return desensitizeStrategyList.stream().filter(item -> item.getDetailStrategy(type)).findFirst().orElse(null);
     }
 }

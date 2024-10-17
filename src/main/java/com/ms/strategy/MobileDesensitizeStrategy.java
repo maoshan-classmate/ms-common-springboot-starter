@@ -1,8 +1,11 @@
 package com.ms.strategy;
 
 import cn.hutool.core.util.DesensitizedUtil;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.ms.enums.DesensitizationTypeEnum;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * @author maoshan-classmate
@@ -14,12 +17,12 @@ public class MobileDesensitizeStrategy extends AbstractDesensitizeStrategy{
 
 
     @Override
-    public String desensitizeDate(String content) {
-        return "";
+    public void desensitizeDate(String content, int startInclude, int endExclude, String customChar, JsonGenerator jsonGenerator) throws IOException {
+        jsonGenerator.writeString(DesensitizedUtil.mobilePhone(content));
     }
 
     @Override
-    public boolean getDetailStrategy(Integer type) {
-        return DesensitizationTypeEnum.MOBILE.getType().equals(type);
+    public boolean getDetailStrategy(DesensitizationTypeEnum type) {
+        return DesensitizationTypeEnum.MOBILE.equals(type);
     }
 }
