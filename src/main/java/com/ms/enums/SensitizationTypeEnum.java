@@ -52,7 +52,6 @@ public enum SensitizationTypeEnum {
      * 密码
      */
     PASSWORD
-    ;
 
 
 }

@@ -11,6 +11,7 @@ import com.ms.annotation.MsSensitization;
 import com.ms.context.SensitizeContext;
 import com.ms.enums.SensitizationTypeEnum;
 import com.ms.strategy.SensitizeStrategy;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,10 +26,11 @@ import java.util.Objects;
  */
 @Slf4j
 @Setter
+@NoArgsConstructor(force = true)
 public class SensitizationSerialize extends JsonSerializer<String> implements ContextualSerializer {
 
 
-    private final SensitizationTypeEnum sensitizationType;
+    private  SensitizationTypeEnum sensitizationType;
 
     private final int startInclude;
 
@@ -37,8 +39,9 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
     private final String customChar;
 
 
-    public SensitizationSerialize(SensitizationTypeEnum sensitizationType,int startInclude, int endExclude, String customChar) {
-        this.sensitizationType = sensitizationType;
+
+
+    public SensitizationSerialize(Integer startInclude, Integer endExclude, String customChar) {
         this.startInclude = startInclude;
         this.endExclude = endExclude;
         this.customChar = customChar;
@@ -66,6 +69,7 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
                     msSensitization = property.getContextAnnotation(MsSensitization.class);
                 }
                 if (msSensitization != null) {
+                    sensitizationType=msSensitization.type();
                     SensitizationSerialize customSensitization = createCustomSensitization(msSensitization.type(), msSensitization.startInclude(),
                             msSensitization.endExclude(), msSensitization.customChar(), msSensitization.enableRegex(), msSensitization.customRegex());
                     return customSensitization != null ? customSensitization :  prov.findValueSerializer(property.getType(), property);
@@ -89,13 +93,14 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
      */
     private SensitizationSerialize createCustomSensitization(SensitizationTypeEnum sensitizationType, int startInclude, int endExclude,
                                                                  String customChar, boolean enableRegex, String customRegex) {
+        SensitizationSerialize sensitizationSerialize = new SensitizationSerialize(startInclude, endExclude, customChar);
         if (SensitizationTypeEnum.CUSTOM == sensitizationType && enableRegex){
             //优先使用自定义正则表达式
             if (StrUtil.isBlank(customRegex)){
                 return null;
             }
-            new SensitizationSerialize(sensitizationType, startInclude, endExclude, customChar);
         }
-        return new SensitizationSerialize(sensitizationType, startInclude, endExclude, customChar);
+        sensitizationSerialize.sensitizationType = sensitizationType;
+        return sensitizationSerialize;
     }
 }
