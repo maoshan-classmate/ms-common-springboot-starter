@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class SensitizeContext {
 
-    private static final SensitizeContext instance = new SensitizeContext();
+    private static  SensitizeContext instance;
 
     /**
      * 脱敏策略
