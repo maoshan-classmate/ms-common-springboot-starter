@@ -52,4 +52,9 @@ public @interface MsSensitization {
      */
     String customRegex() default "";
 
+    /**
+     * 正则表达式进行替换
+     */
+    String customReplace() default "";
+
 }
