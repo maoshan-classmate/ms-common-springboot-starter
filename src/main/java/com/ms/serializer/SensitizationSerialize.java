@@ -8,9 +8,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.ms.annotation.MsSensitization;
-import com.ms.context.SensitizeContext;
 import com.ms.enums.SensitizationTypeEnum;
-import com.ms.strategy.SensitizeStrategy;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +28,7 @@ import java.util.Objects;
 public class SensitizationSerialize extends JsonSerializer<String> implements ContextualSerializer {
 
 
-    private  SensitizationTypeEnum sensitizationType;
+    private SensitizationTypeEnum sensitizationStrategy;
 
     private final int startInclude;
 
@@ -39,9 +37,8 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
     private final String customChar;
 
 
-
-    public SensitizationSerialize(SensitizationTypeEnum sensitizationType,Integer startInclude, Integer endExclude, String customChar) {
-        this.sensitizationType = sensitizationType;
+    public SensitizationSerialize(SensitizationTypeEnum sensitizationStrategy, Integer startInclude, Integer endExclude, String customChar) {
+        this.sensitizationStrategy = sensitizationStrategy;
         this.startInclude = startInclude;
         this.endExclude = endExclude;
         this.customChar = customChar;
@@ -49,13 +46,11 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
 
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        SensitizeStrategy sensitizeStrategy = SensitizeContext.getInstance().getStrategy(sensitizationType);
-        if (sensitizeStrategy != null) {
-            String sensitizeDate = sensitizeStrategy.sensitizeDate(value, startInclude, endExclude, customChar, gen);
+        if (sensitizationStrategy != null) {
             log.info("脱敏前数据为：{}", value);
+            String sensitizeDate = sensitizationStrategy.sensitizeDate(value, startInclude, endExclude, customChar, gen);
             log.info("脱敏后数据为：{}", sensitizeDate);
         }
-
     }
 
     @Override
@@ -69,10 +64,10 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
                     msSensitization = property.getContextAnnotation(MsSensitization.class);
                 }
                 if (msSensitization != null) {
-                    sensitizationType=msSensitization.type();
+                    sensitizationStrategy = msSensitization.type();
                     SensitizationSerialize customSensitization = createCustomSensitization(msSensitization.type(), msSensitization.startInclude(),
                             msSensitization.endExclude(), msSensitization.customChar(), msSensitization.enableRegex(), msSensitization.customRegex());
-                    return customSensitization != null ? customSensitization :  prov.findValueSerializer(property.getType(), property);
+                    return customSensitization != null ? customSensitization : prov.findValueSerializer(property.getType(), property);
                 }
             }
             return prov.findValueSerializer(property.getType(), property);
@@ -83,20 +78,21 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
 
     /**
      * 构建自定义序列化器
-     * @param sensitizationType 脱敏数据类型
-     * @param startInclude 脱敏开始位置（包含）
-     * @param endExclude 脱敏结束位置（不包含）
-     * @param customChar 脱敏使用的特殊字符
-     * @param enableRegex 是否使用正则表达式进行脱敏
-     * @param customRegex 正则表达式进行脱敏
+     *
+     * @param sensitizationStrategy 脱敏数据类型
+     * @param startInclude          脱敏开始位置（包含）
+     * @param endExclude            脱敏结束位置（不包含）
+     * @param customChar            脱敏使用的特殊字符
+     * @param enableRegex           是否使用正则表达式进行脱敏
+     * @param customRegex           正则表达式进行脱敏
      * @return 自定义序列化器
      */
-    private SensitizationSerialize createCustomSensitization(SensitizationTypeEnum sensitizationType, int startInclude, int endExclude,
-                                                                 String customChar, boolean enableRegex, String customRegex) {
-        SensitizationSerialize sensitizationSerialize = new SensitizationSerialize(sensitizationType,startInclude, endExclude, customChar);
-        if (SensitizationTypeEnum.CUSTOM == sensitizationType && enableRegex){
+    private SensitizationSerialize createCustomSensitization(SensitizationTypeEnum sensitizationStrategy, int startInclude, int endExclude,
+                                                             String customChar, boolean enableRegex, String customRegex) {
+        SensitizationSerialize sensitizationSerialize = new SensitizationSerialize(sensitizationStrategy, startInclude, endExclude, customChar);
+        if (SensitizationTypeEnum.CUSTOM == sensitizationStrategy && enableRegex) {
             //优先使用自定义正则表达式
-            if (StrUtil.isBlank(customRegex)){
+            if (StrUtil.isBlank(customRegex)) {
                 return null;
             }
         }
