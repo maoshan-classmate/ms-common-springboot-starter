@@ -40,7 +40,8 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
 
 
 
-    public SensitizationSerialize(Integer startInclude, Integer endExclude, String customChar) {
+    public SensitizationSerialize(SensitizationTypeEnum sensitizationType,Integer startInclude, Integer endExclude, String customChar) {
+        this.sensitizationType = sensitizationType;
         this.startInclude = startInclude;
         this.endExclude = endExclude;
         this.customChar = customChar;
@@ -92,14 +93,13 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
      */
     private SensitizationSerialize createCustomSensitization(SensitizationTypeEnum sensitizationType, int startInclude, int endExclude,
                                                                  String customChar, boolean enableRegex, String customRegex) {
-        SensitizationSerialize sensitizationSerialize = new SensitizationSerialize(startInclude, endExclude, customChar);
+        SensitizationSerialize sensitizationSerialize = new SensitizationSerialize(sensitizationType,startInclude, endExclude, customChar);
         if (SensitizationTypeEnum.CUSTOM == sensitizationType && enableRegex){
             //优先使用自定义正则表达式
             if (StrUtil.isBlank(customRegex)){
                 return null;
             }
         }
-        sensitizationSerialize.sensitizationType = sensitizationType;
         return sensitizationSerialize;
     }
 }
