@@ -28,9 +28,12 @@ public enum SensitizationTypeEnum {
         @Override
         public String sensitizeDate(String content, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
+            if (StrUtil.isBlank(content)){
+                return StrUtil.EMPTY;
+            }
             String customHidden;
             if (!enableRegex) {
-                customHidden = CharSequenceUtil.replace(String.valueOf(content), startInclude,
+                customHidden = CharSequenceUtil.replace(content, startInclude,
                         endExclude >= startInclude ? endExclude : content.length() + endExclude, customChar);
             } else {
                 customHidden = Pattern.compile(customRegex).matcher(content).replaceAll(Character.toString(customChar));
@@ -60,7 +63,6 @@ public enum SensitizationTypeEnum {
         @Override
         public String sensitizeDate(String idCard, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
-            //身份证不能为空
             if (StrUtil.isBlank(idCard)) {
                 return StrUtil.EMPTY;
             }
@@ -102,7 +104,7 @@ public enum SensitizationTypeEnum {
         public String sensitizeDate(String bankCardNo, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
             if (StrUtil.isBlank(bankCardNo)) {
-                return bankCardNo;
+                return StrUtil.EMPTY;
             }
             bankCardNo = StrUtil.cleanBlank(bankCardNo);
             if (bankCardNo.length() < 9) {
@@ -150,11 +152,14 @@ public enum SensitizationTypeEnum {
      */
     NAME {
         @Override
-        public String sensitizeDate(String content, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
+        public String sensitizeDate(String name, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
-            String name = CharSequenceUtil.replace(String.valueOf(content), 1, content.length(), customChar);
-            jsonGenerator.writeString(name);
-            return name;
+            if (StrUtil.isBlank(name)){
+                return StrUtil.EMPTY;
+            }
+            String sensitizeName = CharSequenceUtil.replace(name, 1, name.length(), customChar);
+            jsonGenerator.writeString(sensitizeName);
+            return sensitizeName;
         }
     },
 
