@@ -32,32 +32,23 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
 
     private SensitizationTypeEnum sensitizationStrategy;
 
-    private final int startInclude;
+    private int startInclude;
 
-    private final int endExclude;
+    private int endExclude;
 
-    private final String customChar;
+    private char customChar;
 
     private boolean enableRegex;
 
     private String customRegex;
 
-    private String customReplace;
 
-
-    public SensitizationSerialize(SensitizationTypeEnum sensitizationStrategy, Integer startInclude, Integer endExclude, String customChar) {
-        this.sensitizationStrategy = sensitizationStrategy;
-        this.startInclude = startInclude;
-        this.endExclude = endExclude;
-        this.customChar = customChar;
-    }
 
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        //TODO 注解上属性带不出来
         if (sensitizationStrategy != null) {
             log.info("脱敏前数据为：{}", value);
-            String sensitizeDate = sensitizationStrategy.sensitizeDate(value, startInclude, endExclude, customChar, gen,enableRegex, customRegex, customReplace);
+            String sensitizeDate = sensitizationStrategy.sensitizeDate(value, startInclude, endExclude, customChar, gen, enableRegex, customRegex);
             log.info("脱敏后数据为：{}", sensitizeDate);
         }
     }
@@ -75,7 +66,7 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
                 if (msSensitization != null) {
                     sensitizationStrategy = msSensitization.type();
                     return createCustomSensitization(msSensitization.type(), msSensitization.startInclude(),
-                            msSensitization.endExclude(), msSensitization.customChar(), msSensitization.enableRegex(), msSensitization.customRegex(),msSensitization.customReplace());
+                            msSensitization.endExclude(), msSensitization.customChar(), msSensitization.enableRegex(), msSensitization.customRegex());
                 }
             }
             return prov.findValueSerializer(property.getType(), property);
@@ -96,13 +87,13 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
      * @return 自定义序列化器
      */
     private SensitizationSerialize createCustomSensitization(SensitizationTypeEnum sensitizationStrategy, int startInclude, int endExclude,
-                                                             String customChar, boolean enableRegex, String customRegex,String customReplace) {
+                                                             char customChar, boolean enableRegex, String customRegex) {
         if (SensitizationTypeEnum.CUSTOM == sensitizationStrategy && enableRegex) {
             //优先使用自定义正则表达式
             if (StrUtil.isBlank(customRegex)) {
-                return new SensitizationSerialize(sensitizationStrategy, startInclude, endExclude, customChar, true, customRegex,customReplace);
+                return new SensitizationSerialize(sensitizationStrategy, startInclude, endExclude, customChar, true, customRegex);
             }
         }
-        return new SensitizationSerialize(sensitizationStrategy, startInclude, endExclude, customChar);
+        return new SensitizationSerialize(sensitizationStrategy, startInclude, endExclude, customChar, enableRegex,customRegex);
     }
 }

@@ -45,16 +45,13 @@ public @interface MsSensitization {
     /**
      * 脱敏使用的特殊字符
      */
-    String customChar() default "*";
+    char customChar() default '*';
 
     /**
      * 正则表达式进行脱敏
      */
     String customRegex() default "";
 
-    /**
-     * 正则表达式进行替换
-     */
-    String customReplace() default "";
+
 
 }
