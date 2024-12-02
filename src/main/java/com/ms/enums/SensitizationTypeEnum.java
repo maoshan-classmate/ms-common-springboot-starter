@@ -50,6 +50,9 @@ public enum SensitizationTypeEnum {
         @Override
         public String sensitizeDate(String phone, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
+            if (StrUtil.isBlank(phone)) {
+                return StrUtil.EMPTY;
+            }
             String mobilePhone = StrUtil.replace(phone, 3, phone.length() - 4, customChar);
             jsonGenerator.writeString(mobilePhone);
             return mobilePhone;
@@ -68,7 +71,7 @@ public enum SensitizationTypeEnum {
             }
             //需要截取的长度不能大于身份证号长度
             if (3 > idCard.length()) {
-                return StrUtil.EMPTY;
+                return idCard;
             }
             String idCardNum = StrUtil.replace(idCard, 1, idCard.length() - 2, customChar);
             jsonGenerator.writeString(idCardNum);
