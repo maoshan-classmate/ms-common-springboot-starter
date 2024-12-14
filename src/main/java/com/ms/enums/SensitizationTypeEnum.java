@@ -53,6 +53,9 @@ public enum SensitizationTypeEnum {
             if (StrUtil.isBlank(phone)) {
                 return StrUtil.EMPTY;
             }
+            if (11 > phone.length()) {
+                return phone;
+            }
             String mobilePhone = StrUtil.replace(phone, 3, phone.length() - 4, customChar);
             jsonGenerator.writeString(mobilePhone);
             return mobilePhone;
@@ -90,7 +93,7 @@ public enum SensitizationTypeEnum {
                 return StrUtil.EMPTY;
             }
             int index = StrUtil.indexOf(email, '@');
-            if (index <= 1) {
+            if (1 >=index ) {
                 return email;
             }
             String sensitizeEmail = StrUtil.replace(email, 1, index, customChar);
@@ -110,14 +113,12 @@ public enum SensitizationTypeEnum {
                 return StrUtil.EMPTY;
             }
             bankCardNo = StrUtil.cleanBlank(bankCardNo);
-            if (bankCardNo.length() < 9) {
+            if (9 > bankCardNo.length() ) {
                 return bankCardNo;
             }
-
             final int length = bankCardNo.length();
             final int endLength = length % 4 == 0 ? 4 : length % 4;
             final int midLength = length - 4 - endLength;
-
             final StringBuilder buf = new StringBuilder();
             buf.append(bankCardNo, 0, 4);
             for (int i = 0; i < midLength; ++i) {
@@ -144,6 +145,9 @@ public enum SensitizationTypeEnum {
                 return StrUtil.EMPTY;
             }
             int length = address.length();
+            if (8 > length){
+                return address;
+            }
             String sensitizeAddress = StrUtil.replace(address, length - 8, length, customChar);
             jsonGenerator.writeString(sensitizeAddress);
             return sensitizeAddress;
@@ -160,6 +164,9 @@ public enum SensitizationTypeEnum {
             if (StrUtil.isBlank(name)){
                 return StrUtil.EMPTY;
             }
+            if (1 >= name.length()) {
+                return name;
+            }
             String sensitizeName = CharSequenceUtil.replace(name, 1, name.length(), customChar);
             jsonGenerator.writeString(sensitizeName);
             return sensitizeName;
@@ -175,6 +182,9 @@ public enum SensitizationTypeEnum {
                                     boolean enableRegex, String customRegex) throws IOException {
             if (StrUtil.isBlank(password)) {
                 return StrUtil.EMPTY;
+            }
+            if (1 >= password.length()) {
+                return password;
             }
             String sensitizePassword = StrUtil.repeat(customChar, password.length());
             jsonGenerator.writeString(sensitizePassword);
