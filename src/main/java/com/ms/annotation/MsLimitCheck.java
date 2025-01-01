@@ -21,7 +21,7 @@ public @interface MsLimitCheck {
     /**
      * 重试次数
      */
-    int count();
+    int count() default 3;
 
     /**
      * 重试时间
