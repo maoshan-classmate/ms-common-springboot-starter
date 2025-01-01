@@ -1,6 +1,7 @@
-package com.ms.aspect;
+package com.ms.annotation;
 
 import java.lang.annotation.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author maoshan-classmate
@@ -26,6 +27,11 @@ public @interface MsLimitCheck {
      * 重试时间
      */
     int expireCache();
+
+    /**
+     * 重试单位 (默认：分钟)
+     */
+    TimeUnit timeUnit() default TimeUnit.MINUTES;
 
 
     /**
