@@ -16,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -36,11 +37,10 @@ public class MsLimitCheckAspect {
     private ApplicationContext applicationContext;
 
 
-
-    Map<Integer, Cache<String, AtomicInteger>> cacheMap= Maps.newHashMap();
+    Map<Integer, Cache<String, AtomicInteger>> cacheMap = Maps.newHashMap();
 
     @PostConstruct
-    public void init(){
+    public void init() {
         for (String beanDefinitionName : applicationContext.getBeanDefinitionNames()) {
             Object bean = applicationContext.getBean(beanDefinitionName);
             for (Method method : ReflectUtil.getMethods(bean.getClass())) {
@@ -60,29 +60,29 @@ public class MsLimitCheckAspect {
         Method method = methodSignature.getMethod();
         method.setAccessible(true);
         MsLimitCheck msLimitCheck = AnnotationUtil.getAnnotation(method, MsLimitCheck.class);
-        if (msLimitCheck == null){
+        if (msLimitCheck == null) {
             return proceedingJoinPoint.proceed();
         }
         Cache<String, AtomicInteger> localCache = cacheMap.get(msLimitCheck.expireCache());
         String lockKey = msLimitCheck.lockKey();
-        if (StrUtil.isEmpty(lockKey)){
+        if (StrUtil.isEmpty(lockKey)) {
             ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            if (requestAttributes != null){
+            if (requestAttributes != null) {
                 HttpServletRequest request = requestAttributes.getRequest();
                 lockKey = ServletUtil.getClientIP(request);
-            }else {
+            } else {
                 lockKey = "127.0.0.1";
             }
         }
         AtomicInteger atomicInteger = localCache.get(lockKey, () -> new AtomicInteger(0));
-        if (atomicInteger.intValue() > msLimitCheck.count()){
+        if (atomicInteger.intValue() > msLimitCheck.count()) {
             throw new RuntimeException(msLimitCheck.errorMessage());
         }
         try {
             return proceedingJoinPoint.proceed();
         } catch (Throwable e) {
             atomicInteger.incrementAndGet();
-            String errorMessage =e.getMessage() + ", 剩余次数:" + (msLimitCheck.count() - atomicInteger.intValue());
+            String errorMessage = e.getMessage() + ", 剩余次数:" + (msLimitCheck.count() - atomicInteger.intValue());
             throw new RuntimeException(errorMessage);
         }
     }
