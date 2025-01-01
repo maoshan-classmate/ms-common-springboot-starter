@@ -39,6 +39,9 @@ public class MsLimitCheckAspect {
 
     Map<Integer, Cache<String, AtomicInteger>> cacheMap = Maps.newHashMap();
 
+    /**
+     * 初始化缓存Map
+     */
     @PostConstruct
     public void init() {
         for (String beanDefinitionName : applicationContext.getBeanDefinitionNames()) {
@@ -74,16 +77,20 @@ public class MsLimitCheckAspect {
                 lockKey = "127.0.0.1";
             }
         }
-        AtomicInteger atomicInteger = localCache.get(lockKey, () -> new AtomicInteger(0));
+        // 若缓存不存在新增一个缓存
+        if (localCache == null){
+            localCache= CacheBuilder.newBuilder().expireAfterAccess(msLimitCheck.expireCache(), msLimitCheck.timeUnit()).maximumSize(1000).build();
+            cacheMap.put(msLimitCheck.expireCache(), localCache);
+        }
+        AtomicInteger atomicInteger = localCache.get(lockKey, () -> new AtomicInteger(1));
+        atomicInteger.incrementAndGet();
         if (atomicInteger.intValue() >= msLimitCheck.count()) {
             throw new RuntimeException(msLimitCheck.errorMessage());
         }
         try {
             return proceedingJoinPoint.proceed();
         } catch (Throwable e) {
-            atomicInteger.incrementAndGet();
-            String errorMessage = e.getMessage() + ", 剩余次数:" + (msLimitCheck.count() - atomicInteger.intValue());
-            throw new RuntimeException(errorMessage);
+            throw new RuntimeException(e);
         }
     }
 }
