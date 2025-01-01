@@ -53,7 +53,7 @@ public class MsLimitCheckAspect {
 //                    continue;
 //                }
 //                Cache<String, AtomicInteger> limitCache = CacheBuilder.newBuilder().expireAfterAccess(msLimitCheck.expireCache(), msLimitCheck.timeUnit()).maximumSize(1000).build();
-//                cacheMap.put(method.getName()+":"+msLimitCheck.expireCache(), limitCache);
+//                cacheMap.put(method.getName()+":"+msLimitCheck.expireCache()+":"+msLimitCheck.count(), limitCache);
 //            }
 //        }
 //    }
@@ -67,7 +67,7 @@ public class MsLimitCheckAspect {
         if (msLimitCheck == null) {
             return proceedingJoinPoint.proceed();
         }
-        Cache<String, AtomicInteger> localCache = cacheMap.get(method.getName()+":"+msLimitCheck.expireCache());
+        Cache<String, AtomicInteger> localCache = cacheMap.get(method.getName()+":"+msLimitCheck.expireCache()+":"+msLimitCheck.count());
         String lockKey = msLimitCheck.lockKey();
         if (CharSequenceUtil.isEmpty(lockKey)) {
             ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -81,11 +81,11 @@ public class MsLimitCheckAspect {
         // 若缓存不存在新增一个缓存
         if (localCache == null){
             localCache= CacheBuilder.newBuilder().expireAfterAccess(msLimitCheck.expireCache(), msLimitCheck.timeUnit()).maximumSize(1000).build();
-            cacheMap.put(method.getName()+":"+msLimitCheck.expireCache(), localCache);
+            cacheMap.put(method.getName()+":"+msLimitCheck.expireCache()+":"+msLimitCheck.count(), localCache);
         }
-        AtomicInteger atomicInteger = localCache.get(lockKey, () -> new AtomicInteger(1));
+        AtomicInteger atomicInteger = localCache.get(lockKey, () -> new AtomicInteger(0));
         atomicInteger.incrementAndGet();
-        if (atomicInteger.intValue() >= msLimitCheck.count()) {
+        if (atomicInteger.intValue() > msLimitCheck.count()) {
             throw new RuntimeException(msLimitCheck.errorMessage());
         }
         try {
