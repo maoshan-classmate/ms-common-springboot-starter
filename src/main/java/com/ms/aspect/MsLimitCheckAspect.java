@@ -75,7 +75,7 @@ public class MsLimitCheckAspect {
             }
         }
         AtomicInteger atomicInteger = localCache.get(lockKey, () -> new AtomicInteger(0));
-        if (atomicInteger.intValue() > msLimitCheck.count()) {
+        if (atomicInteger.intValue() >= msLimitCheck.count()) {
             throw new RuntimeException(msLimitCheck.errorMessage());
         }
         try {
