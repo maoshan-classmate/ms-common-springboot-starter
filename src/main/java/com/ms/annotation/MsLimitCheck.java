@@ -1,5 +1,7 @@
 package com.ms.annotation;
 
+import com.ms.custom.MsCustomLockKeyProvider;
+
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 
@@ -13,10 +15,12 @@ import java.util.concurrent.TimeUnit;
 @Documented
 public @interface MsLimitCheck {
 
+
     /**
-     * 控制粒度(默认：IP address)
+     * 获取自定义控制粒度 (默认：IP address)
      */
-    String lockKey() default "";
+    Class<? extends MsCustomLockKeyProvider> customLockKeyProvider() default MsCustomLockKeyProvider.class;
+
 
     /**
      * 重试次数
@@ -38,5 +42,6 @@ public @interface MsLimitCheck {
      * 错误文案
      */
     String errorMessage() default "请求太频繁，请稍后再试";
+
 
 }

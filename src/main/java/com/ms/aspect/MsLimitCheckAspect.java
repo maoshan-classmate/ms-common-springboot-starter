@@ -9,6 +9,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
 import com.ms.annotation.MsLimitCheck;
+import com.ms.custom.MsCustomLockKeyProvider;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -33,8 +34,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Aspect
 public class MsLimitCheckAspect {
 
+    @Resource
+    private ApplicationContext applicationContext;
 
     Map<String, Cache<String, AtomicInteger>> cacheMap = Maps.newHashMap();
+
 
 
     @Around("@annotation(com.ms.annotation.MsLimitCheck)")
@@ -46,8 +50,16 @@ public class MsLimitCheckAspect {
         if (msLimitCheck == null) {
             return proceedingJoinPoint.proceed();
         }
-        Cache<String, AtomicInteger> localCache = cacheMap.get(method.getName()+":"+msLimitCheck.expireCache()+":"+msLimitCheck.count());
-        String lockKey = msLimitCheck.lockKey();
+        // 判断是否自定义lockKey获取逻辑
+        Class<? extends MsCustomLockKeyProvider> customLockKeyProvider = getCustomLockKeyProvider(proceedingJoinPoint);
+        MsCustomLockKeyProvider msCustomLockKeyProvider = null ;
+        String lockKey;
+        if (customLockKeyProvider != null && !customLockKeyProvider.isInterface()) {
+            msCustomLockKeyProvider = applicationContext.getBean(customLockKeyProvider);
+            lockKey = msCustomLockKeyProvider.getLockKey(proceedingJoinPoint);
+        }else {
+            lockKey=null;
+        }
         if (CharSequenceUtil.isEmpty(lockKey)) {
             ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (requestAttributes != null) {
@@ -57,10 +69,11 @@ public class MsLimitCheckAspect {
                 lockKey = "127.0.0.1";
             }
         }
+        Cache<String, AtomicInteger> localCache = cacheMap.get(lockKey + ":" + method.getName()+":"+msLimitCheck.expireCache()+":"+msLimitCheck.count());
         // 若缓存不存在新增一个缓存
         if (localCache == null){
             localCache= CacheBuilder.newBuilder().expireAfterAccess(msLimitCheck.expireCache(), msLimitCheck.timeUnit()).maximumSize(1000).build();
-            cacheMap.put(method.getName()+":"+msLimitCheck.expireCache()+":"+msLimitCheck.count(), localCache);
+            cacheMap.put(lockKey + ":" + method.getName()+":"+msLimitCheck.expireCache()+":"+msLimitCheck.count(), localCache);
         }
         AtomicInteger atomicInteger = localCache.get(lockKey, () -> new AtomicInteger(0));
         atomicInteger.incrementAndGet();
@@ -72,5 +85,19 @@ public class MsLimitCheckAspect {
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    /**
+     * 获取自定义控制粒度
+     *
+     * @param joinPoint 切点
+     * @return lockKey
+     */
+    private Class<? extends MsCustomLockKeyProvider> getCustomLockKeyProvider(ProceedingJoinPoint joinPoint) {
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        Method method = methodSignature.getMethod();
+        MsLimitCheck msLimitCheck = method.getAnnotation(MsLimitCheck.class);
+        return msLimitCheck.customLockKeyProvider();
     }
 }
