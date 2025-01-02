@@ -34,29 +34,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MsLimitCheckAspect {
 
 
-    @Resource
-    private ApplicationContext applicationContext;
-
-
     Map<String, Cache<String, AtomicInteger>> cacheMap = Maps.newHashMap();
 
-    /**
-     * 初始化缓存Map
-     */
-//    @PostConstruct
-//    public void init() {
-//        for (String beanDefinitionName : applicationContext.getBeanDefinitionNames()) {
-//            Object bean = applicationContext.getBean(beanDefinitionName);
-//            for (Method method : ReflectUtil.getMethods(bean.getClass())) {
-//                MsLimitCheck msLimitCheck = AnnotationUtil.getAnnotation(method, MsLimitCheck.class);
-//                if (msLimitCheck == null || cacheMap.get(method.getName()+":"+msLimitCheck.expireCache()) != null) {
-//                    continue;
-//                }
-//                Cache<String, AtomicInteger> limitCache = CacheBuilder.newBuilder().expireAfterAccess(msLimitCheck.expireCache(), msLimitCheck.timeUnit()).maximumSize(1000).build();
-//                cacheMap.put(method.getName()+":"+msLimitCheck.expireCache()+":"+msLimitCheck.count(), limitCache);
-//            }
-//        }
-//    }
 
     @Around("@annotation(com.ms.annotation.MsLimitCheck)")
     public Object process(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
