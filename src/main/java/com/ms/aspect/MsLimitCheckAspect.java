@@ -2,8 +2,6 @@ package com.ms.aspect;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -18,8 +16,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -40,7 +36,6 @@ public class MsLimitCheckAspect {
     Map<String, Cache<String, AtomicInteger>> cacheMap = Maps.newHashMap();
 
 
-
     @Around("@annotation(com.ms.annotation.MsLimitCheck)")
     public Object process(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         MethodSignature methodSignature = (MethodSignature) proceedingJoinPoint.getSignature();
@@ -52,13 +47,13 @@ public class MsLimitCheckAspect {
         }
         // 判断是否自定义lockKey获取逻辑
         Class<? extends MsCustomLockKeyProvider> customLockKeyProvider = getCustomLockKeyProvider(proceedingJoinPoint);
-        MsCustomLockKeyProvider msCustomLockKeyProvider = null ;
+        MsCustomLockKeyProvider msCustomLockKeyProvider;
         String lockKey;
         if (customLockKeyProvider != null && !customLockKeyProvider.isInterface()) {
             msCustomLockKeyProvider = applicationContext.getBean(customLockKeyProvider);
             lockKey = msCustomLockKeyProvider.getLockKey(proceedingJoinPoint);
-        }else {
-            lockKey=null;
+        } else {
+            lockKey = null;
         }
         if (CharSequenceUtil.isEmpty(lockKey)) {
             ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -69,11 +64,11 @@ public class MsLimitCheckAspect {
                 lockKey = "127.0.0.1";
             }
         }
-        Cache<String, AtomicInteger> localCache = cacheMap.get(lockKey + ":" + method.getName()+":"+msLimitCheck.expireCache()+":"+msLimitCheck.count());
+        Cache<String, AtomicInteger> localCache = cacheMap.get(lockKey + ":" + method.getName() + ":" + msLimitCheck.expireCache() + ":" + msLimitCheck.count());
         // 若缓存不存在新增一个缓存
-        if (localCache == null){
-            localCache= CacheBuilder.newBuilder().expireAfterAccess(msLimitCheck.expireCache(), msLimitCheck.timeUnit()).maximumSize(1000).build();
-            cacheMap.put(lockKey + ":" + method.getName()+":"+msLimitCheck.expireCache()+":"+msLimitCheck.count(), localCache);
+        if (localCache == null) {
+            localCache = CacheBuilder.newBuilder().expireAfterAccess(msLimitCheck.expireCache(), msLimitCheck.timeUnit()).maximumSize(1000).build();
+            cacheMap.put(lockKey + ":" + method.getName() + ":" + msLimitCheck.expireCache() + ":" + msLimitCheck.count(), localCache);
         }
         AtomicInteger atomicInteger = localCache.get(lockKey, () -> new AtomicInteger(0));
         atomicInteger.incrementAndGet();

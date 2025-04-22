@@ -1,6 +1,6 @@
 package com.ms.serializer;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -88,12 +88,9 @@ public class SensitizationSerialize extends JsonSerializer<String> implements Co
      */
     private SensitizationSerialize createCustomSensitization(SensitizationTypeEnum sensitizationStrategy, int startInclude, int endExclude,
                                                              char customChar, boolean enableRegex, String customRegex) {
-        if (SensitizationTypeEnum.CUSTOM == sensitizationStrategy && enableRegex) {
-            //优先使用自定义正则表达式
-            if (StrUtil.isBlank(customRegex)) {
+        if (SensitizationTypeEnum.CUSTOM == sensitizationStrategy && enableRegex && CharSequenceUtil.isBlank(customRegex)) {
                 return new SensitizationSerialize(sensitizationStrategy, startInclude, endExclude, customChar, true, customRegex);
             }
-        }
         return new SensitizationSerialize(sensitizationStrategy, startInclude, endExclude, customChar, enableRegex,customRegex);
     }
 }

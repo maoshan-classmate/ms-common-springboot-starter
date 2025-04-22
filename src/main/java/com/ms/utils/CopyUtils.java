@@ -1,17 +1,9 @@
 package com.ms.utils;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.text.CharSequenceUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -84,54 +76,5 @@ public class CopyUtils extends BeanUtil {
             }
         }
         return list;
-    }
-
-    /**
-     * 将json转换为Java对象(支持复杂类型)
-     *
-     * @param json    json字符串
-     * @param typeRef 要转化的Java对象的类型
-     * @param <T>     要转化的Java对象的类型
-     * @return Java对象
-     */
-    public static <T> T jsonToBean(String json, TypeReference<T> typeRef) {
-        if (CharSequenceUtil.isBlank(json)) {
-            return getDefaultInstance(typeRef);
-        }
-        try {
-            return JSON.parseObject(json, typeRef);
-        } catch (Exception e) {
-            throw new RuntimeException("json转换异常", e);
-        }
-    }
-
-    /**
-     * 根据传入的类型返回空集合或空对象
-     *
-     * @param typeRef 传入类型
-     * @param <T>     传入类型
-     * @return 返回空集合或空对象
-     */
-    private static <T> T getDefaultInstance(TypeReference<T> typeRef) {
-        Type type = typeRef.getType();
-        Class<?> rawType;
-        if (type instanceof Class) {
-            rawType = (Class<?>) type;
-        } else if (type instanceof ParameterizedType) {
-            rawType = (Class<?>) ((ParameterizedType) type).getRawType();
-        } else {
-            throw new IllegalArgumentException("不支持的类型: " + type);
-        }
-        if (Collection.class.isAssignableFrom(rawType)) {
-            return (T) Collections.emptyList();
-        } else if (Map.class.isAssignableFrom(rawType)) {
-            return (T) Collections.emptyMap();
-        } else {
-            try {
-                return (T) rawType.getDeclaredConstructor().newInstance();
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException("无法创建默认实例: " + rawType.getName(), e);
-            }
-        }
     }
 }

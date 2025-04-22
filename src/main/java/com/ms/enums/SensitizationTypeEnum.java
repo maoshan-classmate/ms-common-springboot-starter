@@ -1,8 +1,7 @@
 package com.ms.enums;
 
+import cn.hutool.core.text.CharPool;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.CharUtil;
-import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,8 +27,8 @@ public enum SensitizationTypeEnum {
         @Override
         public String sensitizeDate(String content, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
-            if (StrUtil.isBlank(content)){
-                return StrUtil.EMPTY;
+            if (CharSequenceUtil.isBlank(content)){
+                return CharSequenceUtil.EMPTY;
             }
             String customHidden;
             if (!enableRegex) {
@@ -50,13 +49,13 @@ public enum SensitizationTypeEnum {
         @Override
         public String sensitizeDate(String phone, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
-            if (StrUtil.isBlank(phone)) {
-                return StrUtil.EMPTY;
+            if (CharSequenceUtil.isBlank(phone)) {
+                return CharSequenceUtil.EMPTY;
             }
             if (11 > phone.length()) {
                 return phone;
             }
-            String mobilePhone = StrUtil.replace(phone, 3, phone.length() - 4, customChar);
+            String mobilePhone = CharSequenceUtil.replace(phone, 3, phone.length() - 4, customChar);
             jsonGenerator.writeString(mobilePhone);
             return mobilePhone;
         }
@@ -69,14 +68,14 @@ public enum SensitizationTypeEnum {
         @Override
         public String sensitizeDate(String idCard, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
-            if (StrUtil.isBlank(idCard)) {
-                return StrUtil.EMPTY;
+            if (CharSequenceUtil.isBlank(idCard)) {
+                return CharSequenceUtil.EMPTY;
             }
             //需要截取的长度不能大于身份证号长度
             if (3 > idCard.length()) {
                 return idCard;
             }
-            String idCardNum = StrUtil.replace(idCard, 1, idCard.length() - 2, customChar);
+            String idCardNum = CharSequenceUtil.replace(idCard, 1, idCard.length() - 2, customChar);
             jsonGenerator.writeString(idCardNum);
             return idCardNum;
         }
@@ -89,14 +88,14 @@ public enum SensitizationTypeEnum {
         @Override
         public String sensitizeDate(String email, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
-            if (StrUtil.isBlank(email)) {
-                return StrUtil.EMPTY;
+            if (CharSequenceUtil.isBlank(email)) {
+                return CharSequenceUtil.EMPTY;
             }
-            int index = StrUtil.indexOf(email, '@');
+            int index = CharSequenceUtil.indexOf(email, '@');
             if (1 >=index ) {
                 return email;
             }
-            String sensitizeEmail = StrUtil.replace(email, 1, index, customChar);
+            String sensitizeEmail = CharSequenceUtil.replace(email, 1, index, customChar);
             jsonGenerator.writeString(sensitizeEmail);
             return sensitizeEmail;
         }
@@ -109,10 +108,10 @@ public enum SensitizationTypeEnum {
         @Override
         public String sensitizeDate(String bankCardNo, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
-            if (StrUtil.isBlank(bankCardNo)) {
-                return StrUtil.EMPTY;
+            if (CharSequenceUtil.isBlank(bankCardNo)) {
+                return CharSequenceUtil.EMPTY;
             }
-            bankCardNo = StrUtil.cleanBlank(bankCardNo);
+            bankCardNo = CharSequenceUtil.cleanBlank(bankCardNo);
             if (9 > bankCardNo.length() ) {
                 return bankCardNo;
             }
@@ -123,11 +122,11 @@ public enum SensitizationTypeEnum {
             buf.append(bankCardNo, 0, 4);
             for (int i = 0; i < midLength; ++i) {
                 if (i % 4 == 0) {
-                    buf.append(CharUtil.SPACE);
+                    buf.append(CharPool.SPACE);
                 }
                 buf.append(customChar);
             }
-            buf.append(CharUtil.SPACE).append(bankCardNo, length - endLength, length);
+            buf.append(CharPool.SPACE).append(bankCardNo, length - endLength, length);
             String bankCard = buf.toString();
             jsonGenerator.writeString(bankCard);
             return bankCard;
@@ -141,14 +140,14 @@ public enum SensitizationTypeEnum {
         @Override
         public String sensitizeDate(String address, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
-            if (StrUtil.isBlank(address)) {
-                return StrUtil.EMPTY;
+            if (CharSequenceUtil.isBlank(address)) {
+                return CharSequenceUtil.EMPTY;
             }
             int length = address.length();
             if (8 > length){
                 return address;
             }
-            String sensitizeAddress = StrUtil.replace(address, length - 8, length, customChar);
+            String sensitizeAddress = CharSequenceUtil.replace(address, length - 8, length, customChar);
             jsonGenerator.writeString(sensitizeAddress);
             return sensitizeAddress;
         }
@@ -161,8 +160,8 @@ public enum SensitizationTypeEnum {
         @Override
         public String sensitizeDate(String name, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
-            if (StrUtil.isBlank(name)){
-                return StrUtil.EMPTY;
+            if (CharSequenceUtil.isBlank(name)){
+                return CharSequenceUtil.EMPTY;
             }
             if (1 >= name.length()) {
                 return name;
@@ -180,13 +179,13 @@ public enum SensitizationTypeEnum {
         @Override
         public String sensitizeDate(String password, int startInclude, int endExclude, char customChar, JsonGenerator jsonGenerator,
                                     boolean enableRegex, String customRegex) throws IOException {
-            if (StrUtil.isBlank(password)) {
-                return StrUtil.EMPTY;
+            if (CharSequenceUtil.isBlank(password)) {
+                return CharSequenceUtil.EMPTY;
             }
             if (1 >= password.length()) {
                 return password;
             }
-            String sensitizePassword = StrUtil.repeat(customChar, password.length());
+            String sensitizePassword = CharSequenceUtil.repeat(customChar, password.length());
             jsonGenerator.writeString(sensitizePassword);
             return sensitizePassword;
         }

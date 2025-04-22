@@ -2,6 +2,7 @@ package com.ms.handler;
 
 
 import cn.hutool.core.util.ClassUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ms.annotation.MsSingleRequestBody;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class MsRequestBodyHandler implements HandlerMethodArgumentResolver {
         }
         if (stringBuilder.startsWith(CURLY_BRACKET_OPEN)) {
             if (ClassUtil.isPrimitiveWrapper(parameterType) || ClassUtil.isBasicType(parameterType) || String.class.equals(parameterType)) {
-                JSONObject jsonObject = JSONObject.parseObject(stringBuilder);
+                JSONObject jsonObject = JSON.parseObject(stringBuilder);
                 return jsonObject.getObject(name, parameterType);
             } else {
                 throw new IllegalArgumentException("@MsSingleRequestBody 只支持基本数据类型、包装类型、字符串类型");
