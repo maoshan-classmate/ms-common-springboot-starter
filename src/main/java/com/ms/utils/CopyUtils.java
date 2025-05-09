@@ -67,14 +67,17 @@ public class CopyUtils extends BeanUtil {
         List<T> list = new ArrayList<>(sources.size());
         for (S source : sources) {
             //添加判断条件
-            if (condition.test(source) && (callBack != null)) {
+            if (condition.test(source)) {
                 T t = target.get();
                 copyProperties(source, t);
-                // 回调
-                callBack.accept(source, t);
+                if (callBack != null) {
+                    // 回调
+                    callBack.accept(source, t);
+                }
                 list.add(t);
             }
         }
         return list;
     }
+
 }
