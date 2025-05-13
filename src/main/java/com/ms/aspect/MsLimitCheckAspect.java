@@ -46,7 +46,7 @@ public class MsLimitCheckAspect {
             return proceedingJoinPoint.proceed();
         }
         // 判断是否自定义lockKey获取逻辑
-        Class<? extends MsCustomLockKeyProvider> customLockKeyProvider = getCustomLockKeyProvider(proceedingJoinPoint);
+        Class<? extends MsCustomLockKeyProvider> customLockKeyProvider = msLimitCheck.customLockKeyProvider();
         MsCustomLockKeyProvider msCustomLockKeyProvider;
         String lockKey;
         if (customLockKeyProvider != null && !customLockKeyProvider.isInterface()) {
@@ -82,17 +82,4 @@ public class MsLimitCheckAspect {
         }
     }
 
-
-    /**
-     * 获取自定义控制粒度
-     *
-     * @param joinPoint 切点
-     * @return lockKey
-     */
-    private Class<? extends MsCustomLockKeyProvider> getCustomLockKeyProvider(ProceedingJoinPoint joinPoint) {
-        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-        Method method = methodSignature.getMethod();
-        MsLimitCheck msLimitCheck = method.getAnnotation(MsLimitCheck.class);
-        return msLimitCheck.customLockKeyProvider();
-    }
 }
